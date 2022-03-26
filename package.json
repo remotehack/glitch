@@ -12,7 +12,7 @@
     "url": "https://github.com//remotehack/glitch"
   },
   "author": "",
-  "license": "Unlicensed",
+  "license": "MIT",
   "devDependencies": {
     "live-server": "^1.2.1"
   }
