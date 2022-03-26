@@ -28,7 +28,7 @@ function randomiseByX(input, x) {
 
 export function randomFrameSlices(chunks, { chunkSize }) {
     const key = chunks.shift();
-    const shuffledChunks = randomiseByX(chunks, 15);
+    const shuffledChunks = randomiseByX(chunks, chunkSize);
     shuffledChunks.unshift(key);
     return shuffledChunks;
 }
