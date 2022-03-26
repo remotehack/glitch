@@ -28,6 +28,22 @@ function populateForm() {
     mutatorSelectElement.innerHTML = Object.keys(mutators)
         .map((m) => `<option value="${m}">${m}</option>`)
         .join("");
+
+    mutatorSelectElement.addEventListener("change", addAdditionalInputs);
+    addAdditionalInputs();
+
+    function addAdditionalInputs() {
+        const additionalArgs = mutators[mutatorSelectElement.value].args;
+
+        let argsInputHtml = Object.entries(additionalArgs)
+            .map(
+                ([argName, { name, defaultValue }]) =>
+                    `<label for="${argName}-input">${name}</label><input id="${argName}-input" name="${argName}" value="${defaultValue}">`
+            )
+            .join("");
+
+        document.querySelector("#additional-inputs").innerHTML = argsInputHtml;
+    }
 }
 
 window.addEventListener("load", async function () {
@@ -45,16 +61,33 @@ window.addEventListener("load", async function () {
             const video = videos[formData.get("video")].path;
             const mutator = mutators[formData.get("mutator")];
 
+            const additionalArgs = Object.entries(mutator.args)
+                .map(([key, { type }]) => {
+                    switch (type) {
+                        case "number":
+                            return [key, parseFloat(formData.get(key))];
+                        default:
+                            return [key, formData.get(key)];
+                    }
+                })
+                .reduce((prev, [key, value]) => {
+                    prev[key] = value;
+                    return prev;
+                }, {});
+
+            console.log(video, mutator, additionalArgs);
+
             run({
                 path: video,
                 mutator,
+                args: additionalArgs,
             });
         });
 });
 
 let currentInterval = undefined;
 
-async function run({ path, mutator }) {
+async function run({ path, mutator, args }) {
     if (currentInterval !== undefined) {
         clearInterval(currentInterval);
         currentInterval = undefined;
@@ -62,8 +95,7 @@ async function run({ path, mutator }) {
 
     let demuxer = new MP4Demuxer(path);
 
-    let maxFrames = 100;
-    let i = 0;
+    const maxFrames = 150;
 
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
@@ -83,12 +115,6 @@ async function run({ path, mutator }) {
             const bitmap = await createImageBitmap(frame);
             frames.push(bitmap);
             frame.close();
-
-            if (i++ === maxFrames) {
-                console.log("Reached maxFrames");
-                decoder.close();
-                return;
-            }
         },
         error: (e) => console.error(e),
     });
@@ -100,13 +126,13 @@ async function run({ path, mutator }) {
     const chunks = await new Promise((resolve) => {
         const chunks = [];
         demuxer.start((chunk) => {
-            if (chunks.push(chunk) === 150) {
+            if (chunks.push(chunk) === maxFrames) {
                 resolve(chunks.slice(0));
             }
         });
     });
 
-    const mutatedChunks = mutator.mutate(chunks, mutator.args);
+    const mutatedChunks = mutator.mutate(chunks, args);
 
     for (const chunk of mutatedChunks) {
         decoder.decode(chunk);
