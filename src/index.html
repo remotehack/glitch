@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Glitchy</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <style>
+            video, canvas {
+                max-width: 100%;
+                margin: auto;
+                margin-top: 1em;
+            }
+            label {
+                margin-top: 0.5em;
+                display: block;
+            }
+            input, select, button {
+                margin-top: 0.25em;
+                display: block;
+            }
+        </style>
+
+    </head>
+    <body>
+
+        <form id="options-form">
+            <h3>Options</h3>
+            <label for="video-input">Video</label>
+            <select id="video-input" name="video"></select>
+            <label for="mutator-input">Input</label>
+            <select id="mutator-input" name="mutator"></select>
+            <button type="submit" id="start-button">Start</button>
+        </form>
+
+        <canvas width="512" height="512"></canvas>
+
+        <script src="js/main.js" type="module"></script>
+
+    </body>
+</html>
