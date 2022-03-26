@@ -2,6 +2,7 @@ import { randomFrameSlices } from "./random-frame-slices.js";
 import { swappedFrame } from "./swapped-frame.js";
 import { deleteFrames } from "./delete-frames.js";
 import { reverseFrames } from "./reverse-frames.js";
+import { duplicateFrames } from "./duplicate-frames.js";
 
 export const mutators = {
     "Random frame slices": {
@@ -46,6 +47,21 @@ export const mutators = {
     },
     "Reverse frames": {
         mutate: reverseFrames,
+        args: {
+            start: {
+                defaultValue: 10,
+                name: "First frame",
+                type: "number",
+            },
+            end: {
+                defaultValue: 20,
+                name: "Last frame",
+                type: "number",
+            },
+        },
+    },
+    "Duplicate frames": {
+        mutate: duplicateFrames,
         args: {
             start: {
                 defaultValue: 10,
