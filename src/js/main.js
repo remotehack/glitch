@@ -16,15 +16,22 @@ const videos = {
     },
 };
 
+const maxFrames = 150;
+
 function populateForm() {
+    const mutatorDescriptionElement = document.querySelector(
+        "#mutator-description"
+    );
     const mutatorSelectElement = document.querySelector("#mutator-input");
     const videoSelectElement = document.querySelector("#video-input");
 
     console.log(videos, mutators);
 
-    videoSelectElement.innerHTML = Object.keys(videos)
+    const videoOptions = Object.keys(videos)
         .map((v) => `<option value="${v}">${v}</option>`)
         .join("");
+
+    videoSelectElement.innerHTML = videoOptions;
     mutatorSelectElement.innerHTML = Object.keys(mutators)
         .map((m) => `<option value="${m}">${m}</option>`)
         .join("");
@@ -35,11 +42,31 @@ function populateForm() {
     function addAdditionalInputs() {
         const additionalArgs = mutators[mutatorSelectElement.value].args;
 
+        mutatorDescriptionElement.innerText =
+            mutators[mutatorSelectElement.value].description;
+
         let argsInputHtml = Object.entries(additionalArgs)
-            .map(
-                ([argName, { name, defaultValue }]) =>
-                    `<label for="${argName}-input">${name}</label><input id="${argName}-input" name="${argName}" value="${defaultValue}">`
-            )
+            .map(([argName, { name, defaultValue, type }]) => {
+                switch (type) {
+                    case "number":
+                        return `
+                            <label for="${argName}-input">${name}</label>
+                            <input id="${argName}-input" name="${argName}-arg" value="${defaultValue}" type="number">
+                        `;
+                    case "video":
+                        return `
+                            <label for="${argName}-input">${name}</label>
+                            <select id="${argName}-input" name="${argName}-arg" value="${defaultValue}">
+                                ${videoOptions}
+                            </select>
+                        `;
+                    default:
+                        return `
+                            <label for="${argName}-input">${name}</label>
+                            <input id="${argName}-input" name="${argName}-arg" value="${defaultValue}">
+                        `;
+                }
+            })
             .join("");
 
         document.querySelector("#additional-inputs").innerHTML = argsInputHtml;
@@ -51,7 +78,7 @@ window.addEventListener("load", async function () {
 
     document
         .querySelector("#start-button")
-        .addEventListener("click", function (event) {
+        .addEventListener("click", async function (event) {
             event.preventDefault();
 
             const formData = new FormData(
@@ -61,41 +88,72 @@ window.addEventListener("load", async function () {
             const video = videos[formData.get("video")].path;
             const mutator = mutators[formData.get("mutator")];
 
-            const additionalArgs = Object.entries(mutator.args)
-                .map(([key, { type }]) => {
+            const additionalArgs = Object.entries(mutator.args).map(
+                ([key, { type }]) => {
+                    const value = formData.get(key + "-arg");
+                    console.log(value);
                     switch (type) {
                         case "number":
-                            return [key, parseFloat(formData.get(key))];
+                            return [key, parseFloat(value)];
+                        case "video":
+                            return [
+                                key,
+                                (async () =>
+                                    (await loadChunks(videos[value].path))
+                                        .chunks)(),
+                            ];
                         default:
-                            return [key, formData.get(key)];
+                            return [key, value];
                     }
-                })
-                .reduce((prev, [key, value]) => {
-                    prev[key] = value;
-                    return prev;
-                }, {});
+                }
+            );
 
-            console.log(video, mutator, additionalArgs);
+            /* Some of the values will be promises, so let's resolve them. */
+            const args = await resolveArgs(additionalArgs);
 
             run({
                 path: video,
                 mutator,
-                args: additionalArgs,
+                args,
             });
         });
 });
 
+async function resolveArgs(args) {
+    const newArgs = {};
+    for (const [key, value] of args) {
+        newArgs[key] = await value;
+    }
+    return newArgs;
+}
+
 let currentInterval = undefined;
 
 async function run({ path, mutator, args }) {
+    console.log(args);
     if (currentInterval !== undefined) {
         clearInterval(currentInterval);
         currentInterval = undefined;
     }
 
-    let demuxer = new MP4Demuxer(path);
+    const { chunks, config } = await loadChunks(path, maxFrames);
 
-    const maxFrames = 150;
+    const mutatedChunks = await mutator.mutate(chunks, args);
+
+    const decoder = new VideoDecoder({
+        output: async (frame) => {
+            const bitmap = await createImageBitmap(frame);
+            frames.push(bitmap);
+            frame.close();
+        },
+        error: (e) => console.error(e),
+    });
+
+    decoder.configure(config);
+
+    for (const chunk of mutatedChunks) {
+        decoder.decode(chunk);
+    }
 
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
@@ -109,32 +167,24 @@ async function run({ path, mutator, args }) {
         }
     }
     currentInterval = setInterval(render, 100);
+}
 
-    const decoder = new VideoDecoder({
-        output: async (frame) => {
-            const bitmap = await createImageBitmap(frame);
-            frames.push(bitmap);
-            frame.close();
-        },
-        error: (e) => console.error(e),
-    });
+async function loadChunks(path) {
+    let demuxer = new MP4Demuxer(path);
 
     const config = await demuxer.getConfig();
 
-    decoder.configure(config);
+    console.log(path, config);
 
-    const chunks = await new Promise((resolve) => {
-        const chunks = [];
-        demuxer.start((chunk) => {
-            if (chunks.push(chunk) === maxFrames) {
-                resolve(chunks.slice(0));
-            }
-        });
-    });
-
-    const mutatedChunks = mutator.mutate(chunks, args);
-
-    for (const chunk of mutatedChunks) {
-        decoder.decode(chunk);
-    }
+    return {
+        chunks: await new Promise((resolve) => {
+            const chunks = [];
+            demuxer.start((chunk) => {
+                if (chunks.push(chunk) === maxFrames) {
+                    resolve(chunks.slice(0));
+                }
+            });
+        }),
+        config,
+    };
 }
