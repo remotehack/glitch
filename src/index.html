@@ -19,13 +19,22 @@
                 margin-top: 0.25em;
                 display: block;
             }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.1em;
+            }
         </style>
 
     </head>
     <body>
-
+        <h1>Glitch!</h1>
+        <p>MP4 mashing. Select a video, select a mutator, give the arguments.
+        <p>You should give values of less than 150 for frame arguments; we only
+            load the first 150 frames of each video.
         <form id="options-form">
-            <h3>Options</h3>
+            <h2>Options</h2>
             <label for="video-input">Video</label>
             <select id="video-input" name="video"></select>
             <label for="mutator-input">Mutator</label>

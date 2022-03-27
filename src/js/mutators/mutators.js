@@ -113,6 +113,7 @@ export const mutators = {
     },
     "No op": {
         mutate: (chunks) => chunks,
+        description: "Doesn't change the video.",
         args: {},
     },
 };
