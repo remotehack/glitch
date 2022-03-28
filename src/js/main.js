@@ -163,6 +163,8 @@ async function run({ path, mutator, args }) {
         const frame = frames[f++ % frames.length];
 
         if (frame) {
+            canvas.width = frame.width
+            canvas.height = frame.height
             ctx.drawImage(frame, 0, 0);
         }
     }
