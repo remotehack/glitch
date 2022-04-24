@@ -1,5 +1,8 @@
 import { MP4Demuxer } from "./mp4/MP4Demuxer.js";
 import { mutators } from "./mutators/mutators.js";
+import { Logger } from "./util.js";
+
+const logger = new Logger(document.querySelector("output"))
 
 const videos = {
     "Ferry square": {
@@ -80,6 +83,7 @@ window.addEventListener("load", async function () {
         .querySelector("#start-button")
         .addEventListener("click", async function (event) {
             event.preventDefault();
+            logger.clear()
 
             const formData = new FormData(
                 document.querySelector("#options-form")
@@ -146,7 +150,7 @@ async function run({ path, mutator, args }) {
             frames.push(bitmap);
             frame.close();
         },
-        error: (e) => console.error(e),
+        error: (e) => logger.log(`Error: ${e}`)
     });
 
     decoder.configure(config);
