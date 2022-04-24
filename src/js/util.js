@@ -1,3 +1,21 @@
+export const qs = document.querySelector.bind(document)
+export const qsa = document.querySelectorAll.bind(document)
+
+export const videos = {
+    "Ferry square": {
+        path: "/video/ferry-square.mp4",
+    },
+    Ink: {
+        path: "/video/ink.mp4",
+    },
+    Motorbike: {
+        path: "/video/motorbike.mp4",
+    },
+    Turbo: {
+        path: "/video/turbo.mp4",
+    },
+};
+
 export class Logger {
     #ul = document.createElement('ul');
 
@@ -18,4 +36,14 @@ export class Logger {
         li.innerText = text
         this.#ul.appendChild(li)
     }
+}
+
+
+export const persist = (element, key) => {
+    const found = sessionStorage.getItem(key)
+    if (found) { element.value = found };
+
+    element.addEventListener('change', () =>
+        sessionStorage.setItem(key, element.value)
+    )
 }

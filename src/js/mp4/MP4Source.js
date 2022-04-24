@@ -61,14 +61,20 @@ export class MP4Source {
     return this.file.moov.traks[0].mdia.minf.stbl.stsd.entries[0].avcC;
   }
 
-  start(track, onChunk) {
+  start(track, onChunk, raw = false) {
     this._onChunk = onChunk;
+    this._raw = raw;
     this.file.setExtractionOptions(track.id);
     this.file.start();
   }
 
   onSamples(track_id, ref, samples) {
     for (const sample of samples) {
+      if (this._raw) {
+        this._onChunk(sample);
+        continue
+      }
+
       const type = sample.is_sync ? "key" : "delta";
 
       const chunk = new EncodedVideoChunk({

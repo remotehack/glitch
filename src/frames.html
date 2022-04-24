@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Glitchy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      video,
+      canvas {
+        max-width: 100%;
+        margin: auto;
+        border: 1px solid #ccc;
+      }
+      label {
+        margin-top: 0.5em;
+        display: block;
+      }
+      input,
+      select,
+      button {
+        margin-top: 0.25em;
+        display: block;
+      }
+      .logger {
+        list-style: none;
+        padding: 0;
+      }
+
+      .type-key {
+        background: aqua;
+      }
+      .type-delta {
+        background: #fc0;
+      }
+      #frames {
+        display: flex;
+        list-style: none;
+        flex-wrap: wrap;
+        gap: 1px;
+        font-family: monospace;
+        padding: 0;
+      }
+      #frames > li {
+        padding: 0.25em;
+        cursor: pointer;
+      }
+      .sortable-selected {
+        opacity: 0.7;
+        outline: 1px #08f solid;
+      }
+      .sortable-ghost {
+        opacity: 0.1;
+      }
+      .sortable-choosen {
+        transform: scale(0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <h3>Frames</h3>
+      <label
+        >Video
+        <select name="video"></select>
+      </label>
+
+      <ul id="frames"></ul>
+
+      <button>Generate</button>
+    </form>
+
+    <script src="js/frames.js" type="module"></script>
+  </body>
+</html>

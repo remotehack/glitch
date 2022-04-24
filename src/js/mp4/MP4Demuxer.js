@@ -57,7 +57,7 @@ export class MP4Demuxer {
     return Promise.resolve(config);
   }
 
-  start(onChunk) {
-    this.source.start(this.track, onChunk);
+  start(onChunk, raw = false) {
+    this.source.start(this.track, onChunk, raw);
   }
 }
