@@ -834,40 +834,40 @@
                                 'id': 0x86,  // CodecID
                                 'data': 'V_' + options.codec
                             }, /*
-              (options.codec == 'VP8' ?
-                   {
-                     'id': 0x63A2,  // Codec private data
-                     'data': []
-                   } :
-                   {
-                     'id': 0x63A2,  // Codec private data for vp9
-                     'data': [
-                       {
-                         'id': 1,  // vp9 Profile
-                         'size': 1,
-                         'data': 0
-                       },
-                       {
-                         'id': 2,  // Feature level
-                         'size': 1,
-                         'data': 10
-                       },
-                       {
-                         'id': 3,  // bitdepth level
-                         'size': 1,
-                         'data': 8
-                       },
-                       {
-                         'id': 4,  // color sampling
-                         'size': 1,
-                         'data': 0
-                       }
-                     ]
-                   }),
-              {
-                'id': 0x258688,  // CodecName
-                'data': options.codec
-              },*/
+             (options.codec == 'VP8' ?
+                  {
+                    'id': 0x63A2,  // Codec private data
+                    'data': []
+                  } :
+                  {
+                    'id': 0x63A2,  // Codec private data for vp9
+                    'data': [
+                      {
+                        'id': 1,  // vp9 Profile
+                        'size': 1,
+                        'data': 0
+                      },
+                      {
+                        'id': 2,  // Feature level
+                        'size': 1,
+                        'data': 10
+                      },
+                      {
+                        'id': 3,  // bitdepth level
+                        'size': 1,
+                        'data': 8
+                      },
+                      {
+                        'id': 4,  // color sampling
+                        'size': 1,
+                        'data': 0
+                      }
+                    ]
+                  }),
+             {
+               'id': 0x258688,  // CodecName
+               'data': options.codec
+             },*/
                         ]
                     }]
                 };
@@ -1164,3 +1164,6 @@
             WebMWriter(self.ArrayBufferDataStream, self.BlobBuffer);
     }
 })();
+
+
+export default self.WebMWriter
