@@ -15,6 +15,9 @@ export const videos = {
     Turbo: {
         path: "/glitch/src/video/turbo.mp4",
     },
+    Skate: {
+        path: "https://benjaminbenben.com/scrub/videos/skate-square.mp4",
+    }
 };
 
 export class Logger {
