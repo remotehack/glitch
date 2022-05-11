@@ -3,16 +3,17 @@ export const qsa = document.querySelectorAll.bind(document)
 
 export const videos = {
     "Ferry square": {
-        path: "/video/ferry-square.mp4",
+        // todo: generate urls better
+        path: "/glitch/src/video/ferry-square.mp4",
     },
     Ink: {
-        path: "/video/ink.mp4",
+        path: "/glitch/src/video/ink.mp4",
     },
     Motorbike: {
-        path: "/video/motorbike.mp4",
+        path: "/glitch/src/video/motorbike.mp4",
     },
     Turbo: {
-        path: "/video/turbo.mp4",
+        path: "/glitch/src/video/turbo.mp4",
     },
 };
 
